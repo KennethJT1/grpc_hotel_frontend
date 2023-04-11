@@ -1,16 +1,24 @@
 import React, { useEffect } from "react";
 import { Tabs } from "antd";
 import { useAuth } from "../context/auth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const { TabPane } = Tabs;
 export const Profile = () => {
-   //hook
-   const [auth, setAuth] = useAuth();
-  const user = JSON.parse(localStorage.getItem("auth"));
+  //hook
+  const [auth, setAuth] = useAuth();
+
+  const navigate = useNavigate();
+  const user = null || JSON.parse(localStorage.getItem("auth"));
+  const myProfile = null || user.user;
 
   useEffect(() => {
-    if (!user) {
-      window.location.href = "/login";
+    if (!auth) {
+      navigate("/hotels");
+      toast.error("You are not authorized to access this page. Please");
+    } else {
+      navigate("/profile");
     }
   }, []);
 
@@ -20,9 +28,9 @@ export const Profile = () => {
         <TabPane tab="Profile" key="1">
           <h1>My Profile</h1>
           <br />
-          <h1>Name: {user.name}</h1>
-          <h1>Email: {user.email}</h1>
-          <h1>IsAdmin: {user.isAdmin ? "yes" : "No"}</h1>
+          <h1>Name: {myProfile.name}</h1>
+          <h1>Email: {myProfile.email}</h1>
+          <h1>IsAdmin: {myProfile.role === "ADMIN" ? "YES" : "NO"}</h1>
         </TabPane>
       </Tabs>
     </div>

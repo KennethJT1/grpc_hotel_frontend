@@ -8,10 +8,10 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
-  const [name, setName] = useState("Kenneth");
-  const [email, setEmail] = useState("Kenneth@gmail.com");
-  const [password, setPassword] = useState("qqqqqq");
-  const [cpassword, setCpassword] = useState("qqqqqq");
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [cpassword, setCpassword] = useState();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
@@ -23,34 +23,30 @@ export const Register = () => {
 
   const register = async () => {
     if (password === cpassword) {
+      try {
+        setLoading(true);
+        const { data } = await axios.post("/users/signup", {
+          name,
+          email,
+          password,
+          cpassword,
+        });
+        if (data?.error) {
+          toast.error(data.error);
+        } else {
+          localStorage.setItem("auth", JSON.stringify(data.data));
+          setAuth({ ...auth, token: data.data.token, user: data.data.user });
+          toast.success("Registration successful");
+          navigate("/login");
+        }
 
-    try {
-      setLoading(true);
-      const { data } = await axios.post("/users/signup", {
-        name,
-        email,
-        password,
-        cpassword,
-      });
-      console.log("data===>", data.data);
-      if (data?.error) {
-        toast.error(data.error);
-      } else {
-        localStorage.setItem("auth", JSON.stringify(data.data));
-        setAuth({ ...auth, token: data.token, user: data.data.user });
-        toast.success("Registration successful");
-        navigate("/hotels");
+        setLoading(false);
+        setSuccess(true);
+      } catch (error) {
+        setLoading(false);
+        setError(true);
+        toast.error("Email already exist");
       }
-
-
-      setLoading(false);
-      setSuccess(true);
-    } catch (error) {
-      setLoading(false);
-      setError(true);
-      toast.error(error.response.data.message);
-      console.log("error==>",error.response.data.message);
-    }
     } else {
       toast.error("Password does not match");
     }

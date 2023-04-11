@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Loading } from "../components/Loading";
 import { Error } from "../components/Error";
-import { Success } from "../components/Success";
 import { useAuth } from "../context/auth";
+import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const Login = () => {
-  const [email, setEmail] = useState("bola@gmail.com");
-  const [password, setPassword] = useState("1234");
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
-  const [success, setSuccess] = useState();
 
   //hook
   const [auth, setAuth] = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const login = async () => {
     const user = {
@@ -27,12 +29,18 @@ export const Login = () => {
       const { data } = await axios.post("users/signin", user);
       setLoading(false);
 
-      localStorage.setItem("currentuser", JSON.stringify(data));
-      window.location.href = "/home";
+      if (data?.error) {
+        toast.error(data.error);
+      } else {
+        localStorage.setItem("auth", JSON.stringify(data.user));
+        setAuth({ ...auth, token: data.user.token, user: data.user.user });
+        toast.success("Login successful");
+        navigate(location.state || "/hotels");
+      }
     } catch (error) {
       setLoading(false);
       setError(true);
-      console.log(error.message);
+      toast.error("Invalid email or password");
     }
   };
 
@@ -53,7 +61,7 @@ export const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
-              type="text"
+              type="password"
               className="form-control"
               placeholder="password"
               value={password}

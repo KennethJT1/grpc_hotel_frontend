@@ -16,7 +16,7 @@ code {
 }
 
 .navbar {
-  background-color: black !important;
+  background-color: red !important;
 }
 
 .nav-link {
@@ -58,7 +58,7 @@ h1 {
   height: 400px !important;
 }
 
-input, select, .ant-picker {
+input, select {
   box-shadow: none !important;
   margin-top: 10px;
   border: 1px solid black !important;
@@ -78,16 +78,12 @@ h2 {
   border: 0px solid black !important;
 }
 
-.ant-picker-input input {
-  border: none !important;;
-}
-
 p{
   font-size: 16px !important;
 }
 
 .landing{
-  background-color: black !important;
+  background-color: red !important;
   height: 100vh;
 }
 

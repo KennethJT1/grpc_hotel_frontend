@@ -2,19 +2,20 @@ import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import axios from "axios";
 import { Loading } from "../components/Loading";
-import { Error } from "../components/Error";
-import swal from "sweetalert2"
+import swal from "sweetalert2";
 import { useAuth } from "../context/auth";
-
+import { useNavigate } from "react-router-dom";
 const { TabPane } = Tabs;
 
 //ADMIN Component
 export const Admin = () => {
   const [auth, setAuth] = useAuth();
+  const navigate = useNavigate();
 
   const amAdmin = async () => {
-    if (!JSON.parse(localStorage.getItem("auth")).isAdmin) {
-      window.location.href = "/home";
+    const admin = JSON.parse(localStorage.getItem("auth"));
+    if (admin.user.role !== "ADMIN") {
+      navigate("/hotels");
     }
   };
 
@@ -30,7 +31,7 @@ export const Admin = () => {
         <TabPane tab="Rooms" key="2">
           <Rooms />
         </TabPane>
-        <TabPane tab="Add Room" key="3">
+        <TabPane tab="Add Hotel" key="3">
           <AddRoom />
         </TabPane>
         <TabPane tab="Users" key="4">
@@ -52,8 +53,8 @@ export const Rooms = () => {
   const allBooking = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`api/hotels?page=1&limit=20`);
-      setRooms(data);
+      const { data } = await axios.get(`/hotels?limit=20`);
+      setRooms(data.hotels);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -76,10 +77,9 @@ export const Rooms = () => {
             <tr>
               <th>Room Id</th>
               <th>Name</th>
-              <th>Type</th>
-              <th>Rent per day</th>
-              <th>Max count</th>
-              <th>Phone number</th>
+              <th>Location</th>
+              <th>Price</th>
+              <th>Description</th>
             </tr>
           </thead>
 
@@ -88,12 +88,11 @@ export const Rooms = () => {
               rooms.map((room) => {
                 return (
                   <tr>
-                    <td>{room._id}</td>
+                    <td>{room.id}</td>
                     <td>{room.name}</td>
-                    <td>{room.type}</td>
-                    <td>{room.rentperday}</td>
-                    <td>{room.maxcount}</td>
-                    <td>{room.phonenumber}</td>
+                    <td>{room.location}</td>
+                    <td>{room.price}</td>
+                    <td>{room.description}</td>
                   </tr>
                 );
               })}
@@ -115,8 +114,8 @@ export const Users = () => {
   const allUsers = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`api/users?page=1&limit=10`);
-      setUsers(data);
+      const { data } = await axios.get(`/users?limit=10`);
+      setUsers(data.users);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -149,10 +148,10 @@ export const Users = () => {
               users.map((user) => {
                 return (
                   <tr>
-                    <td>{user._id}</td>
+                    <td>{user.id}</td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
-                    <td>{user.isAdmin ? "YES" : "NO"}</td>
+                    <td>{user.role === "ADMIN" ? "YES" : "NO"}</td>
                   </tr>
                 );
               })}
@@ -166,47 +165,38 @@ export const Users = () => {
 //ADD ROOM Component
 export const AddRoom = () => {
   const [auth, setAuth] = useAuth();
-  
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
 
   //data
   const [name, setname] = useState();
-  const [rentperday, setrentperday] = useState();
-  const [maxcount, setmaxcount] = useState();
+  const [price, setPrice] = useState();
   const [description, setdescription] = useState();
-  const [phone, setphone] = useState();
-  const [type, settype] = useState();
   const [location, setLocation] = useState();
-  const [imageurl1, setimageurl1] = useState();
-  const [imageurl2, setimageurl2] = useState();
+  const [imageurl, setimageurl] = useState("");
 
   const addRoom = async () => {
-
     const newRoom = {
       name,
-      rentperday,
-      maxcount,
+      price,
       description,
-      phone,
-      type,
       location,
-      imageurls: [imageurl1, imageurl2],
+      imageurl,
     };
-
-
     try {
       setLoading(true);
-       const { data } = await axios.post(`api/hotels`, newRoom);
+      const { data } = await axios.post(`/hotels`, newRoom);
       setLoading(false);
       swal
         .fire("Congratulations", "Your room has been created", "success")
         .then((result) => {
-          window.location.href = "/home";
+          navigate("/hotels");
         });
     } catch (error) {
       setLoading(false);
-      swal.fire("Oops", "Something went wrong", "error");
+      swal.fire(" Hotel with that name already exists");
       setError(error.message);
     }
   };
@@ -223,18 +213,11 @@ export const AddRoom = () => {
           onChange={(e) => setname(e.target.value)}
         />
         <input
-          type="text"
+          type="number"
           className="form-control"
-          placeholder="Rent per day"
-          value={rentperday}
-          onChange={(e) => setrentperday(e.target.value)}
-        />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Max count"
-          value={maxcount}
-          onChange={(e) => setmaxcount(e.target.value)}
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
         />
         <input
           type="text"
@@ -243,22 +226,8 @@ export const AddRoom = () => {
           value={description}
           onChange={(e) => setdescription(e.target.value)}
         />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setphone(e.target.value)}
-        />
       </div>
       <div className="col-md-5">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Type"
-          value={type}
-          onChange={(e) => settype(e.target.value)}
-        />
         <input
           type="text"
           className="form-control"
@@ -269,16 +238,9 @@ export const AddRoom = () => {
         <input
           type="text"
           className="form-control"
-          placeholder="Image url 1"
-          value={imageurl1}
-          onChange={(e) => setimageurl1(e.target.value)}
-        />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Image url 2"
-          value={imageurl2}
-          onChange={(e) => setimageurl2(e.target.value)}
+          placeholder="Image url"
+          value={imageurl}
+          onChange={(e) => setimageurl(e.target.value)}
         />
 
         <div className="text-right">

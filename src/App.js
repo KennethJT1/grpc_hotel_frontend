@@ -9,6 +9,8 @@ import { Profile } from "./screens/Profile";
 import { Admin } from "./screens/Admin";
 import { LandingPage } from "./screens/LandingPage";
 
+import { PrivateRoute } from "./components/routes/PrivateRoute";
+
 const PageNotFound = () => {
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
@@ -22,13 +24,17 @@ function App() {
     <div className="App">
       <Navbar />
       <BrowserRouter>
-      <Toaster position="top-right" />
+        <Toaster position="top-right" />
         <Routes>
+          <Route path="/" element={<PrivateRoute />}>
+            <Route path="profile" element={<Profile />} />
+
+            <Route path="admin" element={<Admin />} />
+          </Route>
+
           <Route path="/hotels" exact element={<HomeScreen />} />
           <Route path="/register" exact element={<Register />} />
           <Route path="/login" exact element={<Login />} />
-          <Route path="/profile" exact element={<Profile />} />
-          <Route path="/admin" exact element={<Admin />} />
           <Route path="/" exact element={<LandingPage />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>

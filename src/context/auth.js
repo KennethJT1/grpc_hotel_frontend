@@ -9,18 +9,17 @@ const AuthProvider = ({ children}) => {
         token: ""
     });
 
-    // axios config
-    axios.defaults.baseURL = process.env.REACT_APP_API
+   
+    axios.defaults.baseURL = process.env.REACT_APP_API;
     axios.defaults.headers.common["Authorization"] = auth?.token;
 
-    //useEffect is to retain the data from auth which can be accessible by all component 
-    useEffect(()=> {
-        const data = localStorage.getItem("auth");
-        if(data) {
-            const parsed = JSON.parse(data);
-            setAuth({...auth, user: parsed.user, token:parsed.token })
-        }
-    }, [])
+    useEffect(() => {
+      const data = localStorage.getItem("auth");
+      if (data) {
+        const parsed = JSON.parse(data);
+        setAuth({ ...auth, user: parsed.user, token: parsed.token });
+      }
+    }, []);
 
     return (
         <AuthContext.Provider value={[auth, setAuth]}>{children}</AuthContext.Provider>
