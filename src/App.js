@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 import { Navbar } from "./components/Navbar";
@@ -26,17 +26,17 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<PageNotFound />} />
+          <Route path="/hotels" exact element={<HomeScreen />} />
+          <Route path="/register" exact element={<Register />} />
+          <Route path="/login" exact element={<Login />} />
+
           <Route path="/" element={<PrivateRoute />}>
             <Route path="profile" element={<Profile />} />
 
             <Route path="admin" element={<Admin />} />
           </Route>
-
-          <Route path="/hotels" exact element={<HomeScreen />} />
-          <Route path="/register" exact element={<Register />} />
-          <Route path="/login" exact element={<Login />} />
-          <Route path="/" exact element={<LandingPage />} />
-          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
     </div>
