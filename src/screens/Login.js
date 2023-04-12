@@ -56,7 +56,7 @@ export const Login = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="email"
+              placeholder="email in small letters"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
